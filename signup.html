@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForgeAdmin - Sign Up</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body class="bg-gray-50">
+
+<div class="flex h-screen">
+
+    <!-- Left -->
+    <div class="hidden lg:flex w-1/2 bg-gray-900 text-white items-center justify-center">
+        <h1 class="text-3xl font-bold">ForgeAdmin</h1>
+    </div>
+
+    <!-- Right -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center">
+        <div class="w-full max-w-md p-6">
+
+            <h2 class="text-2xl font-bold mb-4">Create Account</h2>
+
+            <!-- FORM -->
+            <form class="space-y-4">
+
+                <input id="name" type="text" placeholder="Full Name" class="w-full p-2 border rounded">
+
+                <input id="email" type="email" placeholder="Email" class="w-full p-2 border rounded">
+
+                <input id="password" type="password" placeholder="Password" class="w-full p-2 border rounded">
+
+                <input id="confirmPassword" type="password" placeholder="Confirm Password" class="w-full p-2 border rounded">
+
+                <button type="submit" class="w-full bg-orange-500 text-white p-2 rounded">
+                    Sign Up
+                </button>
+
+            </form>
+
+            <p class="mt-4 text-sm">
+                Already have an account?
+                <a href="login.html" class="text-blue-600">Login</a>
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- FIREBASE SIGNUP -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCENmDR7KuVvKgQpsDUcoDq0BRglisMqJs",
+  authDomain: "management-7576c.firebaseapp.com",
+  projectId: "management-7576c",
+  storageBucket: "management-7576c.firebasestorage.app",
+  messagingSenderId: "1054683564424",
+  appId: "1:1054683564424:web:4f7f1e7fb568b5d2ca123d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match ❌");
+        return;
+    }
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Signup successful ✅");
+
+        window.location.href = "login.html";
+
+    } catch (error) {
+        alert("Signup failed ❌ " + error.message);
+    }
+});
+</script>
+
+</body>
+</html>

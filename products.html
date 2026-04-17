@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForgeAdmin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body class="font-sans antialiased bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+<!-- ================= SIDEBAR ================= -->
+<aside class="fixed left-0 top-0 h-full w-[270px] bg-sidebar z-50 flex flex-col hidden lg:flex">
+    <div class="flex items-center gap-3 px-6 h-[72px] border-b border-sidebar-border">
+        <div class="w-10 h-10 bg-gradient-to-br from-brand-400 to-brand-600 rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-fire text-white"></i>
+        </div>
+        <div>
+            <h1 class="text-white font-bold text-lg">ForgeAdmin</h1>
+            <p class="text-brand-400 text-[11px]">BackForge Store</p>
+        </div>
+    </div>
+
+    <nav class="flex-1 py-4 px-3 space-y-2 text-gray-400">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="products.html" class="text-brand-400">Products</a>
+    </nav>
+</aside>
+
+<!-- ================= MAIN ================= -->
+<main class="flex-1 lg:ml-[270px]">
+
+<div class="p-6">
+
+<h2 class="text-2xl font-bold mb-4">Products</h2>
+
+<!-- ================= ADD PRODUCT ================= -->
+<div class="flex gap-3 mb-6">
+    <input id="name" placeholder="Product Name" class="border p-2 rounded w-full">
+    <input id="price" placeholder="Price" class="border p-2 rounded w-full">
+    <button onclick="addProduct()" class="bg-orange-500 text-white px-4 py-2 rounded">
+        Add Product
+    </button>
+</div>
+
+<!-- ================= TABLE ================= -->
+<table class="w-full border">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="p-2">Name</th>
+            <th class="p-2">Price</th>
+            <th class="p-2">Action</th>
+        </tr>
+    </thead>
+
+    <tbody id="productList"></tbody>
+</table>
+
+</div>
+</main>
+
+<!-- ================= FIREBASE ================= -->
+<script type="module">
+import { db } from "../firebase.js";
+import { collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ADD
+window.addProduct = async function () {
+    const name = document.getElementById("name").value;
+    const price = document.getElementById("price").value;
+
+    if (!name || !price) {
+        alert("Enter all fields");
+        return;
+    }
+
+    await addDoc(collection(db, "products"), { name, price });
+
+    alert("Added ✅");
+
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+
+    getProducts();
+};
+
+// GET
+async function getProducts() {
+    const list = document.getElementById("productList");
+    list.innerHTML = "";
+
+    const querySnapshot = await getDocs(collection(db, "products"));
+
+    querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+
+        list.innerHTML += `
+        <tr>
+            <td class="p-2">${data.name}</td>
+            <td class="p-2">₹${data.price}</td>
+            <td class="p-2">
+                <button onclick="deleteProduct('${docSnap.id}')" class="text-red-500">
+                    Delete
+                </button>
+            </td>
+        </tr>`;
+    });
+}
+
+// DELETE
+window.deleteProduct = async function (id) {
+    await deleteDoc(doc(db, "products", id));
+    getProducts();
+};
+
+// LOAD
+getProducts();
+</script>
+
+</body>
+</html>
